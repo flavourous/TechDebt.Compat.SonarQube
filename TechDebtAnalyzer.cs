@@ -66,7 +66,7 @@ namespace IronicTechDebt
                           //  context.ReportDiagnostic(Diagnostic.Create(diagRule, loc, "Found correct args"));
                             var code = (TechDebtCode)dca[0].Value;
                             var rule = Rules.Value[code];
-                            var diagnostic = Diagnostic.Create(rule, loc, dca[1].Value as String,);
+                            var diagnostic = Diagnostic.Create(rule, loc, dca[1].Value as String);
                             context.ReportDiagnostic(diagnostic);
                         }
                     }
