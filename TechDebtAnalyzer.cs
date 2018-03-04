@@ -53,21 +53,29 @@ namespace IronicTechDebt
                 //context.ReportDiagnostic(Diagnostic.Create(diagRule, loc, "Found Attribute Check again"));
                 var dca = df.ConstructorArguments;
                 //context.ReportDiagnostic(Diagnostic.Create(diagRule, loc, String.Format("ca lenth is {0}", dca.Length)));
-                if (dca.Length == 2)
+                if (dca.Length == 3)
                 {
-                   // context.ReportDiagnostic(Diagnostic.Create(diagRule, loc, String.Format("dca0 {0}", dca[0].Value)));
+                    // context.ReportDiagnostic(Diagnostic.Create(diagRule, loc, String.Format("dca0 {0}", dca[0].Value)));
                     //if (dca[0].Value != null)
-                      //  context.ReportDiagnostic(Diagnostic.Create(diagRule, loc, String.Format("dca0 value is {0}", ((TechDebtCode)dca[0].Value).ToString())));
+                    //  context.ReportDiagnostic(Diagnostic.Create(diagRule, loc, String.Format("dca0 value is {0}", ((TechDebtCode)dca[0].Value).ToString())));
                     if (dca[0].Value is int)
                     {
                         //context.ReportDiagnostic(Diagnostic.Create(diagRule, loc, String.Format("dca1 {0}", dca[1].Value)));
                         if (dca[1].Value is String)
                         {
-                          //  context.ReportDiagnostic(Diagnostic.Create(diagRule, loc, "Found correct args"));
-                            var code = (TechDebtCode)dca[0].Value;
-                            var rule = Rules.Value[code];
-                            var diagnostic = Diagnostic.Create(rule, loc, dca[1].Value as String);
-                            context.ReportDiagnostic(diagnostic);
+                            //context.ReportDiagnostic(Diagnostic.Create(diagRule, loc, String.Format("dca2 {0}", dca[2].Value)));
+                            if (dca[2].Value is double)
+                            {
+                                //  context.ReportDiagnostic(Diagnostic.Create(diagRule, loc, "Found correct args"));
+                                var code = (TechDebtCode)dca[0].Value;
+                                var rule = Rules.Value[code];
+                                var props = new Dictionary<String, String>
+                                {
+                                    { "gap", dca[2].Value.ToString() }
+                                };
+                                var diagnostic = Diagnostic.Create(rule, loc, props.ToImmutableDictionary(), dca[1].Value as String);
+                                context.ReportDiagnostic(diagnostic);
+                            }
                         }
                     }
                 }
