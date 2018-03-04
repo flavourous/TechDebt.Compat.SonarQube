@@ -1,14 +1,13 @@
 <?xml version="1.0"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
-    <id>IronicTechDebt</id>
+    <id>TechDebt</id>
     <version>2.2.0.0</version>
-    <title>IronicTechDebt</title>
+    <title>TechDebt</title>
     <authors>Dave</authors>
     <owners>Dave</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>IronicTechDebt</description>
-    <releaseNotes>Because .net standard wont work with SonarQube</releaseNotes>
+    <description>TechDebt</description>
     <copyright>Copyright</copyright>
     <tags>analyzers</tags>
   </metadata>

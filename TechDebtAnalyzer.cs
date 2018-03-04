@@ -11,7 +11,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 using System.Diagnostics;
 using TechDebtTypes;
 
-namespace IronicTechDebt
+namespace TechDebt
 {
    
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
