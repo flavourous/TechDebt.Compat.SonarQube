@@ -9,9 +9,9 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 using System.Diagnostics;
-using TechDebtTypes;
+using System.IO;
 
-namespace TechDebt
+namespace TechDebt.Compat.SonarQube
 {
    
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
@@ -21,80 +21,87 @@ namespace TechDebt
         {
             get
             {
-                //return ImmutableArray.Create(Rules.Value.Values.Concat(new[] { riskRule, issueRule, diagRule }).ToArray());
-                return ImmutableArray.Create(diagRule);
+                return ImmutableArray.Create(Rules.Value.Values.Concat(new[] { riskRule, issueRule }).ToArray());
             }
         }
 
         static Lazy<Dictionary<Smell, DiagnosticDescriptor>> Rules = new Lazy<Dictionary<Smell, DiagnosticDescriptor>>
         (
-            () =>  SmellType.Descriptors
+            () => SmellType.Descriptors
                                .ToDictionary
                                 (
-                                 x=>x.Key, 
+                                 x => x.Key,
                                  x => new DiagnosticDescriptor(x.Key.ToString(), x.Value.Title, "{0}", "Tech Debt", DiagnosticSeverity.Info, true, x.Value.Description)
                                 )
         );
 
-        //static DiagnosticDescriptor riskRule = new DiagnosticDescriptor("Risk", "Risk", "{0}", "Risk", DiagnosticSeverity.Info, true, "");
-        //static DiagnosticDescriptor issueRule = new DiagnosticDescriptor("Issue", "Issue", "{0}", "Issue", DiagnosticSeverity.Info, true, "");
-        static DiagnosticDescriptor diagRule = new DiagnosticDescriptor("Diag", "Diag", "{0}", "Diag", DiagnosticSeverity.Info, true, "");
+        static DiagnosticDescriptor riskRule = new DiagnosticDescriptor("Risk", "Risk", "{0}", "Risk", DiagnosticSeverity.Info, true, "");
+        static DiagnosticDescriptor issueRule = new DiagnosticDescriptor("Issue", "Issue", "{0}", "Issue", DiagnosticSeverity.Info, true, "");
 
         public override void Initialize(AnalysisContext context)
         {
             context.RegisterSymbolAction(AnalyzeSymbol, SymbolKind.NamedType);
+        }
+    
+        static object[] Check(INamedTypeSymbol s, String name, params Type[] args)
+        {
+            var atr = s.GetAttributes().ToArray();
+            var mat = atr.FirstOrDefault(a =>
+            {
+                if (a.AttributeClass.Name != name) return false;
+                if (a.ConstructorArguments.Count() != args.Length) return false;
+                for(int i=0;i<args.Length;i++)
+                {
+                    var val = a.ConstructorArguments[i].Value;
+                    if (val == null) return false;
+                    if (val.GetType() != args[i]) return false;
+                }
+                return true;
+            });
+            return mat == null ? null : mat.ConstructorArguments.Select(x => x.Value).ToArray();
         }
 
         private static void AnalyzeSymbol(SymbolAnalysisContext context)
         {
             var namedTypeSymbol = (INamedTypeSymbol)context.Symbol;
             var loc = namedTypeSymbol.Locations[0];
-            var tda = context.Symbol.GetAttributes().ToArray();
 
-            //diag
-            var fa = tda.FirstOrDefault(x => x.AttributeClass.Name == "SmellAttribute");
-            if(fa != null)
+            context.ReportDiagnostic(Diagnostic.Create(issueRule, loc, "Everything"));
+
+            var df = Check(namedTypeSymbol, "Smell", typeof(int), typeof(String), typeof(double));
+            if (df != null)
             {
-                context.ReportDiagnostic(Diagnostic.Create(diagRule, loc, fa.AttributeClass.ToDisplayString()));
+                var code = (Smell)df[0];
+                var rule = Rules.Value[code];
+                var props = new Dictionary<String, String>
+                {
+                    { "gap", (String)df[2] }
+                };
+                var diagnostic = Diagnostic.Create(rule, loc, props.ToImmutableDictionary(), (String)df[1]);
+                context.ReportDiagnostic(diagnostic);
             }
 
-            //var df = tda.FirstOrDefault(x => context.Compilation.GetTypeByMetadataName(typeof(SmellAttribute).FullName) == x.AttributeClass);
-            //if (df != null)
-            //{
-            //    var dca = df.ConstructorArguments;
-            //    var code = (Smell)dca[0].Value;
-            //    var rule = Rules.Value[code];
-            //    var props = new Dictionary<String, String>
-            //    {
-            //        { "gap", dca[2].Value.ToString() }
-            //    };
-            //    var diagnostic = Diagnostic.Create(rule, loc, props.ToImmutableDictionary(), dca[1].Value as String);
-            //    context.ReportDiagnostic(diagnostic);
-            //}
+            var df2 = Check(namedTypeSymbol, "Risk", typeof(String), typeof(double));
+            if (df2 != null)
+            {
+                var props = new Dictionary<String, String>
+                {
+                    { "gap", (String)df[1] }
+                };
+                var diagnostic = Diagnostic.Create(riskRule, loc, props.ToImmutableDictionary(), (String)df[0]);
+                context.ReportDiagnostic(diagnostic);
+            }
 
-            //var df2 = tda.FirstOrDefault(x =>  context.Compilation.GetTypeByMetadataName(typeof(RiskAttribute).FullName) == x.AttributeClass);
-            //if (df2 != null)
-            //{
-            //    var dca = df2.ConstructorArguments;
-            //    var props = new Dictionary<String, String>
-            //    {
-            //        { "gap", dca[1].Value.ToString() }
-            //    };
-            //    var diagnostic = Diagnostic.Create(riskRule, loc, props.ToImmutableDictionary(), dca[0].Value as String);
-            //    context.ReportDiagnostic(diagnostic);
-            //}
-
-            //var df3 = tda.FirstOrDefault(x => context.Compilation.GetTypeByMetadataName(typeof(IssueAttribute).FullName) == x.AttributeClass);
-            //if (df3 != null)
-            //{
-            //    var dca = df3.ConstructorArguments;
-            //    var props = new Dictionary<String, String>
-            //    {
-            //        { "gap", dca[1].Value.ToString() }
-            //    };
-            //    var diagnostic = Diagnostic.Create(issueRule, loc, props.ToImmutableDictionary(), dca[0].Value as String);
-            //    context.ReportDiagnostic(diagnostic);
-            //}
+            var df3 = Check(namedTypeSymbol, "Issue", typeof(String), typeof(double));
+            if (df3 != null)
+            {
+                var props = new Dictionary<String, String>
+                {
+                    { "gap", (String)df[1] }
+                };
+                var diagnostic = Diagnostic.Create(issueRule, loc, props.ToImmutableDictionary(), (String)df[0]);
+                context.ReportDiagnostic(diagnostic);
+            }
         }
     }
 }

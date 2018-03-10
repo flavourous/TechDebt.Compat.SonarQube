@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
-    <id>TechDebt</id>
-    <version>2.2.3.0</version>
-    <title>TechDebt</title>
+    <id>TechDebt.Compat.SonarQube</id>
+    <version>2.3.3.0</version>
+    <title>TechDebt.Compat.SonarQube</title>
     <authors>Dave</authors>
     <owners>Dave</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
@@ -13,7 +13,8 @@
   </metadata>
   <!-- The convention for analyzers is to put language agnostic dlls in analyzers\dotnet and language specific analyzers in either analyzers\dotnet\cs or analyzers\dotnet\vb -->
   <files>
-    <file src="*.dll" target="analyzers\dotnet\cs" exclude="**\Microsoft.CodeAnalysis.*;**\System.Collections.Immutable.*;**\System.Reflection.Metadata.*;**\System.Composition.*" />
-    <file src="tools\*.ps1" target="tools\" />
+    <file src="bin\Release\TechDebt.Compat.SonarQube.dll" target="analyzers\dotnet\cs" />
+    <file src="bin\Release\TechDebt.Compat.SonarQube.Types.dll" target="analyzers\dotnet\cs" />
+    <file src="bin\Release\TechDebt.Compat.SonarQube.Types.dll" target="lib\netstandard1.0" />
   </files>
 </package>

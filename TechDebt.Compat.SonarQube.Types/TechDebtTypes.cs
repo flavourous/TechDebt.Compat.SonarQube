@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using TechDebtTypes;
 using System.Threading.Tasks;
 
-namespace TechDebtTypes
+namespace TechDebt.Compat.SonarQube
 {
     public class IssueAttribute : Attribute
     {
