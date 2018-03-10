@@ -4,6 +4,36 @@
     <chc>
       <key>MAINTAINABILITY_COMPLIANCE</key>
       <chc>
+        <rule-key>Risk</rule-key>
+        <prop>
+          <key>remediationFunction</key>
+          <txt>LINEAR</txt>
+        </prop>
+        <prop>
+          <key>remediationFactor</key>
+          <txt>min</txt>
+          <val>1</val>
+        </prop>
+      </chc>
+    </chc>
+    <chc>
+      <key>MAINTAINABILITY_COMPLIANCE</key>
+      <chc>
+        <rule-key>Issue</rule-key>
+        <prop>
+          <key>remediationFunction</key>
+          <txt>LINEAR</txt>
+        </prop>
+        <prop>
+          <key>remediationFactor</key>
+          <txt>min</txt>
+          <val>1</val>
+        </prop>
+      </chc>
+    </chc>
+    <chc>
+      <key>MAINTAINABILITY_COMPLIANCE</key>
+      <chc>
         <rule-key>DEBT_ABBREVIATIONS_USAGE</rule-key>
         <prop>
           <key>remediationFunction</key>
